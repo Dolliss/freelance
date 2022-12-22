@@ -1,7 +1,6 @@
 import pandas as pd
 from tabulate import tabulate
 from statistics import mean
-from statistics import round
 
 #подсчет среднего
 def estimation(arr):
