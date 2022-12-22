@@ -1,27 +1,18 @@
+from statistics import mean
 import pandas as pd
 from tabulate import tabulate
-from statistics import mean
 
-#подсчет среднего
 def estimation(arr):
-    #поиск минимума и максимума
     mina = min(arr)
     maxa = max(arr)
-    #удаление их
     arr.remove(mina)
     arr.remove(maxa)
-    #берем среднее по массиву с округлением до 2х знаков после запятой
     return round(mean(arr), 2)
 
-#сама задача
 def normal_df(df):
-    #добавляем в датафрейм(таблицу) новый столбец, рассчитаный по функции "estimation"
     df['Средняя'] = df['Оценка'].apply(estimation)
-    #группируем по колонке общество и ищим максимум
     df2 = df.groupby(['Общество']).max()
-    #сортируем по средней оценке и сохраняем изменения
     df2.sort_values(['Средняя'], inplace = True)
-    #обновляем индыксы
     df2.reset_index(inplace = True)
     return df2
 
@@ -69,14 +60,13 @@ def create_table():
                 cheek = False
                 #возвращаем сформированную таблицу
     return pd.DataFrame(df, columns = col)
-
-    #меню выбора 1
+#меню выбора 1
 input_menu1 = [(1, 'Чтение csv файла'),
               (2, 'Создание нового файла'),
              ('Иначе', 'Выход')]
 
 #меню выбора 2
-input_menu2 = [(1, 'Поиск команд'),
+input_menu2 = [(1, 'Продолжить'),
                (2, 'Сохранить файл'),
              ('Иначе', 'Выход')]
 
@@ -113,6 +103,8 @@ while True:
             if list(df) != col:
                 print('Некорректные данные')
                 continue
+            #при чтении наш массив понимается как строка, удаляем скобки, разделяем по запятым и переводим в int
+            df['Оценка'] = df['Оценка'].apply(lambda x: [int(i) for i in x[1:-1].split(',')])
         # если не открывается файл - некорректный путь
         except:
             print('Некорректный путь')
@@ -122,7 +114,13 @@ while True:
     elif cheek==2:
         df = create_table()
         #сохраняем таблицу 
-        df.to_csv('new_table.csv')
+        print('Введите имя файла + .csv для сохранения')
+        path2 = input()
+        try:
+            df.to_csv(path2)
+            print(f'Файл {path2} сохранен')
+        except:
+            print('Некорректное имя файла или таблица')
         
     # иначе - выход 
     else:
@@ -133,3 +131,27 @@ while True:
     df_finall = normal_df(df)
     print('Результат')
     print(tabulate(df_finall, headers='keys', tablefmt='psql'))
+    print(tabulate(input_menu2))
+    cheek2 = input()
+    
+    try:
+        cheek2 = int(cheek2)
+    except:
+        print('Bye!')
+        break
+    if cheek2 == 1:
+        continue
+    elif cheek2 == 2:
+        print('Введите имя файла + .csv для сохранения')
+        path2 = input()
+        try:
+            df.to_csv(path2)
+            print(f'Файл {path2} сохранен')
+        except:
+            print('Некорректное имя файла или таблица')
+    else:
+        print('Bye!')
+        break
+    
+
+    
